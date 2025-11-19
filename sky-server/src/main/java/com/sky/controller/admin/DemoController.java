@@ -14,6 +14,6 @@ public class DemoController {
 
     @GetMapping
     public String hello() {
-        return restTemplate.getForObject("https://www.baidu.com", String.class);
+        return "hello";
     }
 }

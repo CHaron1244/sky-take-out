@@ -8,8 +8,8 @@ sky:
     password: "030419"
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id: LTAI5t7FnT1eWkiVYFNd5aM1
-    access-key-secret: cx54ZQp6BosMIHREqZ6vlK77OYmXHC
+    access-key-id: xxxx
+    access-key-secret: xxxx
     bucket-name: java-cys-oss
     region: cn-beijing
   redis:

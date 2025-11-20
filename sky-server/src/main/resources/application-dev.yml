@@ -12,4 +12,8 @@ sky:
     access-key-secret: cx54ZQp6BosMIHREqZ6vlK77OYmXHC
     bucket-name: java-cys-oss
     region: cn-beijing
-
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    database: 1

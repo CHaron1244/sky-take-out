@@ -35,7 +35,8 @@ public class DishController {
     public Result<List<DishVO>> list(Long categoryId) {
         Dish dish = new Dish();
         dish.setCategoryId(categoryId);
-        dish.setStatus(StatusConstant.ENABLE);// 查询起售中的菜品
+        // 查询起售中的菜品
+        dish.setStatus(StatusConstant.ENABLE);
 
         List<DishVO> list = dishService.listWithFlavor(dish);
 

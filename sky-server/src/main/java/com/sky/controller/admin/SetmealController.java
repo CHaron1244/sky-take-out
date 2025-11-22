@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class SetmealController {
 
     @ApiOperation("新增套餐")
     @RequestMapping(method = RequestMethod.POST)
+    @CacheEvict(cacheNames = "setmealCache", key = "#setmealDTO.categoryId")
     public Result save(@RequestBody SetmealDTO setmealDTO) {
         setmealService.saveWithDish(setmealDTO);
         return Result.success();
@@ -38,6 +40,7 @@ public class SetmealController {
 
     @ApiOperation("删除套餐")
     @RequestMapping(method = RequestMethod.DELETE)
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
     public Result delete(@RequestParam("ids") List<Long> ids) {
         setmealService.deleteBatch(ids);
         return Result.success();
@@ -52,6 +55,7 @@ public class SetmealController {
 
     @ApiOperation("根据id修改套餐")
     @RequestMapping(method = RequestMethod.PUT)
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
     public Result update(@RequestBody SetmealDTO setmealDTO) {
         setmealService.update(setmealDTO);
         return Result.success();
@@ -59,6 +63,7 @@ public class SetmealController {
 
     @ApiOperation("套餐状态起售/停售")
     @RequestMapping(value = "/status/{status}", method = RequestMethod.POST)
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
     public Result startOrStop(@PathVariable("status") Integer status, @RequestParam("id") Long id) {
         setmealService.startOrStop(status, id);
         return Result.success();

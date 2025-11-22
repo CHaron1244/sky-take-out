@@ -9,11 +9,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController("userDishController")
 @RequestMapping("/user/dish")
@@ -22,6 +24,8 @@ import java.util.List;
 public class DishController {
     @Autowired
     private DishService dishService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 根据分类id查询菜品
@@ -33,13 +37,23 @@ public class DishController {
     @GetMapping("/list")
     @ApiOperation("根据分类id查询菜品")
     public Result<List<DishVO>> list(Long categoryId) {
+        // 先从redis中查询缓存
+        List<DishVO> list = (List<DishVO>) redisTemplate.opsForValue().get("dish_" + categoryId);
+        if (list != null && !list.isEmpty()) {
+            return Result.success(list);
+        }
+        // 如果缓存中没有，则从数据库中查询
+        log.info("从数据库中查询菜品数据");
         Dish dish = new Dish();
         dish.setCategoryId(categoryId);
         // 查询起售中的菜品
         dish.setStatus(StatusConstant.ENABLE);
 
-        List<DishVO> list = dishService.listWithFlavor(dish);
-
+        list = dishService.listWithFlavor(dish);
+        // 将查询结果存入redis中
+        redisTemplate.opsForValue().set("dish_" + categoryId, list);
+        // 设置缓存过期时间为10分钟
+        redisTemplate.expire("dish_" + categoryId, 10, TimeUnit.MINUTES);
         return Result.success(list);
     }
 

@@ -11,9 +11,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -22,11 +25,15 @@ import java.util.List;
 public class DishController {
     @Autowired
     private DishService dishService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @ApiOperation("新增菜品")
     @RequestMapping(method = RequestMethod.POST)
+    // @CachePut(cacheNames = "dish", key = "#dishDTO.getCategoryId()")
     public Result save(@RequestBody DishDTO dishDTO) {
         dishService.saveWithFlavor(dishDTO);
+        cleanCache("dish_" + dishDTO.getCategoryId());
         return Result.success();
     }
 
@@ -40,6 +47,7 @@ public class DishController {
     @RequestMapping(method = RequestMethod.DELETE)
     public Result delete(@RequestParam("ids") List<Long> ids) {
         dishService.deleteBatch(ids);
+        cleanCache("dish_*");
         return Result.success();
     }
 
@@ -53,6 +61,7 @@ public class DishController {
     @RequestMapping(method = RequestMethod.PUT)
     public Result update(@RequestBody DishDTO dishDTO) {
         dishService.updateWithFlavor(dishDTO);
+        cleanCache("dish_*");
         return Result.success();
     }
 
@@ -60,6 +69,8 @@ public class DishController {
     @RequestMapping(value = "/status/{status}", method = RequestMethod.POST)
     public Result updateStatus(@PathVariable Integer status, @RequestParam("id") Long id) {
         dishService.updateStatus(status, id);
+        Dish dish = dishService.getById(id);
+        cleanCache("dish_" + dish.getStatus());
         return Result.success();
     }
 
@@ -68,5 +79,10 @@ public class DishController {
     public Result<List<Dish>> list(Long categoryId) {
         List<Dish> list = dishService.list(categoryId);
         return Result.success(list);
+    }
+
+    private void cleanCache(String pattern) {
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
     }
 }

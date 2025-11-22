@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * @author charon
+ */
 @RestController
 @RequestMapping("/user/addressBook")
 @Api(tags = "C端地址簿接口")
@@ -27,8 +30,11 @@ public class AddressBookController {
     @GetMapping("/list")
     @ApiOperation("查询当前登录用户的所有地址信息")
     public Result<List<AddressBook>> list() {
-        AddressBook addressBook = new AddressBook();
-        addressBook.setUserId(BaseContext.getCurrentId());
+        // AddressBook addressBook = new AddressBook();
+        // addressBook.setUserId(BaseContext.getCurrentId());
+        AddressBook addressBook = AddressBook.builder()
+                .userId(BaseContext.getCurrentId())
+                .build();
         List<AddressBook> list = addressBookService.list(addressBook);
         return Result.success(list);
     }
@@ -103,9 +109,13 @@ public class AddressBookController {
     @ApiOperation("查询默认地址")
     public Result<AddressBook> getDefault() {
         // SQL:select * from address_book where user_id = ? and is_default = 1
-        AddressBook addressBook = new AddressBook();
-        addressBook.setIsDefault(1);
-        addressBook.setUserId(BaseContext.getCurrentId());
+        // AddressBook addressBook = new AddressBook();
+        // addressBook.setIsDefault(1);
+        // addressBook.setUserId(BaseContext.getCurrentId());
+        AddressBook addressBook = AddressBook.builder()
+                .isDefault(1)
+                .userId(BaseContext.getCurrentId())
+                .build();
         List<AddressBook> list = addressBookService.list(addressBook);
 
         if (list != null && list.size() == 1) {

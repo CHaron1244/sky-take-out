@@ -15,7 +15,7 @@
     <update id="update" parameterType="Orders">
         update orders
         <set>
-            <if test="cancelReason != null and cancelReason!='' ">
+            <if test="cancelReason != null and cancelReason!=''">
                 cancel_reason=#{cancelReason},
             </if>
             <if test="rejectionReason != null and rejectionReason!='' ">

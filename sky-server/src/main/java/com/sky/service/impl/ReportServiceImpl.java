@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
@@ -81,7 +82,8 @@ public class ReportServiceImpl implements ReportService {
         return UserReportVO.builder()
                 .dateList(StringUtils.join(dateList, ","))
                 .totalUserList(StringUtils.join(totalUserList, ","))
-                .newUserList(StringUtils.join(newUserList, ","))
+                // .newUserList(StringUtils.join(newUserList, ","))
+                .newUserList(StrUtil.join(",", newUserList))
                 .build();
     }
 
@@ -104,12 +106,10 @@ public class ReportServiceImpl implements ReportService {
             validOrderCount = validOrderCount == null ? 0 : validOrderCount;
             validOrderCountList.add(validOrderCount);
         });
-        Integer totalOrderCount = orderCountList.stream().reduce(Integer::sum).get();
+        // Integer totalOrderCount = orderCountList.stream().reduce(Integer::sum).get();
+        Integer totalOrderCount = orderCountList.stream().reduce(0, Integer::sum);
         Integer validOrderCount = validOrderCountList.stream().reduce(Integer::sum).get();
-        Double orderCompletionRate = 0.0;
-        if (totalOrderCount != 0) {
-            orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount;
-        }
+        Double orderCompletionRate = totalOrderCount != 0.0 ? validOrderCount.doubleValue() / totalOrderCount : 0.0;
         return OrderReportVO.builder()
                 .dateList(StringUtils.join(dateList, ","))
                 .orderCountList(StringUtils.join(orderCountList, ","))
@@ -134,8 +134,8 @@ public class ReportServiceImpl implements ReportService {
         LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
         List<GoodsSalesDTO> salesTop10 = orderMapper.getSalesTop10(beginTime, endTime);
         return SalesTop10ReportVO.builder()
-                .nameList(StringUtils.join(salesTop10.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList()), ","))
-                .numberList(StringUtils.join(salesTop10.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList()), ","))
+                .nameList(StrUtil.join(",", salesTop10.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList())))
+                .numberList(StrUtil.join(",", salesTop10.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList())))
                 .build();
     }
 }

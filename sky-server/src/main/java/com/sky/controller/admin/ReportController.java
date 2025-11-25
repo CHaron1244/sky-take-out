@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * @author charon
+ */
 @RequestMapping("/admin/report")
 @RestController
 @Slf4j
@@ -31,7 +34,6 @@ public class ReportController {
     public Result<TurnoverReportVO> turnoverStatistics(
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
-        log.info("营业额数据统计：{}到{}", begin, end);
         return Result.success(reportService.getTurnoverStatistics(begin, end));
     }
 

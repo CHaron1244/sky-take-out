@@ -19,6 +19,7 @@ import java.time.LocalTime;
 
 /**
  * 工作台
+ *
  * @author charon
  */
 @RestController
@@ -41,9 +42,7 @@ public class WorkSpaceController {
         LocalDateTime begin = LocalDateTime.now().with(LocalTime.MIN);
         // 获得当天的结束时间
         LocalDateTime end = LocalDateTime.now().with(LocalTime.MAX);
-
-        BusinessDataVO businessDataVO = workspaceService.getBusinessData(begin, end);
-        return Result.success(businessDataVO);
+        return Result.success(workspaceService.getBusinessData(begin, end));
     }
 
     /**
